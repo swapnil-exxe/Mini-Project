@@ -8,7 +8,8 @@
     "build": "vite build",
     "clean": "rm -rf dist",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "audit:health": "node scripts/audit_repo_health.js"
   },
   "dependencies": {
     "lucide-react": "^0.344.0",
