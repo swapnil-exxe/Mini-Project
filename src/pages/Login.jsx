@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Shield, Users, LogIn } from 'lucide-react'
+import { Eye, EyeOff, Shield, Users, LogIn, Lock, Mail } from 'lucide-react'
 
 function Login({ onLogin, currentUser }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   
   // Selection role for easy prototype exploration
   const [role, setRole] = useState('student')
@@ -14,8 +15,12 @@ function Login({ onLogin, currentUser }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onLogin(email || `${role}@college.edu`, role)
-    navigate('/dashboard')
+    setIsLoading(true)
+    setTimeout(() => {
+      onLogin(email || `${role}@college.edu`, role)
+      setIsLoading(false)
+      navigate('/dashboard')
+    }, 400)
   }
 
   return (
@@ -27,15 +32,16 @@ function Login({ onLogin, currentUser }) {
       padding: '2rem 1.5rem'
     }}>
       <div className="editorial-card" style={{
-        maxWidth: '450px',
+        maxWidth: '460px',
         width: '100%',
         padding: '2.5rem'
       }}>
         {/* Header Title */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Sign In</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-            Connect with your college placement community.
+          <span className="label-caps" style={{ color: 'var(--success)' }}>PORTAL ACCESS</span>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.2rem' }}>Sign In to LOOP</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.4rem' }}>
+            Access placement stories, interview logs, and verified resources.
           </p>
         </div>
 
@@ -43,17 +49,27 @@ function Login({ onLogin, currentUser }) {
           {/* Credentials Inputs */}
           <div className="form-group">
             <label className="form-label">College Email Address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="form-control"
-              placeholder="e.g. swapnil@college.edu"
-              required
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="form-control"
+                placeholder="e.g. swapnil@college.edu"
+                style={{ paddingLeft: '2.5rem' }}
+                required
+              />
+              <Mail size={16} style={{
+                position: 'absolute',
+                top: '50%',
+                left: '0.85rem',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-muted)'
+              }} />
+            </div>
           </div>
 
-          <div className="form-group" style={{ position: 'relative' }}>
+          <div className="form-group">
             <label className="form-label">Password</label>
             <div style={{ position: 'relative' }}>
               <input
@@ -61,10 +77,17 @@ function Login({ onLogin, currentUser }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="form-control"
-                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                style={{ paddingRight: '2.5rem' }}
+                placeholder="••••••••"
+                style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}
                 required
               />
+              <Lock size={16} style={{
+                position: 'absolute',
+                top: '50%',
+                left: '0.85rem',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-muted)'
+              }} />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -86,7 +109,7 @@ function Login({ onLogin, currentUser }) {
             </div>
           </div>
 
-          {/* Prototype Selector Panel (extremely helpful for review) */}
+          {/* Demonstration Role Shortcut Selector */}
           <div style={{
             margin: '1.5rem 0',
             padding: '1rem',
@@ -95,47 +118,50 @@ function Login({ onLogin, currentUser }) {
             borderRadius: '6px'
           }}>
             <span className="label-caps" style={{ display: 'block', fontSize: '0.65rem', marginBottom: '0.5rem', color: 'var(--warning)' }}>
-              PROTOTYPE SHORTCUT ROLE
+              DEMONSTRATION ROLE SHORTCUT
             </span>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button
                 type="button"
-                onClick={() => { setRole('student'); setEmail('student@college.edu'); }}
+                onClick={() => { setRole('student'); setEmail('student@college.edu'); setPassword('password'); }}
                 className="btn btn-secondary"
                 style={{
                   flexGrow: 1,
-                  padding: '0.35rem',
+                  padding: '0.4rem',
                   fontSize: '0.75rem',
-                  backgroundColor: role === 'student' ? 'rgba(255,255,255,0.06)' : 'transparent',
-                  borderColor: role === 'student' ? 'var(--border-focus)' : 'var(--border-color)'
+                  backgroundColor: role === 'student' ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  borderColor: role === 'student' ? 'var(--border-focus)' : 'var(--border-color)',
+                  color: role === 'student' ? '#ffffff' : 'var(--text-secondary)'
                 }}
               >
                 Student
               </button>
               <button
                 type="button"
-                onClick={() => { setRole('contributor'); setEmail('senior@college.edu'); }}
+                onClick={() => { setRole('contributor'); setEmail('senior@college.edu'); setPassword('password'); }}
                 className="btn btn-secondary"
                 style={{
                   flexGrow: 1,
-                  padding: '0.35rem',
+                  padding: '0.4rem',
                   fontSize: '0.75rem',
-                  backgroundColor: role === 'contributor' ? 'rgba(255,255,255,0.06)' : 'transparent',
-                  borderColor: role === 'contributor' ? 'var(--border-focus)' : 'var(--border-color)'
+                  backgroundColor: role === 'contributor' ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  borderColor: role === 'contributor' ? 'var(--border-focus)' : 'var(--border-color)',
+                  color: role === 'contributor' ? '#ffffff' : 'var(--text-secondary)'
                 }}
               >
                 Senior
               </button>
               <button
                 type="button"
-                onClick={() => { setRole('admin'); setEmail('admin@college.edu'); }}
+                onClick={() => { setRole('admin'); setEmail('admin@college.edu'); setPassword('password'); }}
                 className="btn btn-secondary"
                 style={{
                   flexGrow: 1,
-                  padding: '0.35rem',
+                  padding: '0.4rem',
                   fontSize: '0.75rem',
-                  backgroundColor: role === 'admin' ? 'rgba(255,255,255,0.06)' : 'transparent',
-                  borderColor: role === 'admin' ? 'var(--border-focus)' : 'var(--border-color)'
+                  backgroundColor: role === 'admin' ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  borderColor: role === 'admin' ? 'var(--border-focus)' : 'var(--border-color)',
+                  color: role === 'admin' ? '#ffffff' : 'var(--text-secondary)'
                 }}
               >
                 Admin
@@ -143,8 +169,8 @@ function Login({ onLogin, currentUser }) {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', gap: '0.5rem' }}>
-            <LogIn size={16} /> Sign In
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', gap: '0.5rem', height: '44px' }} disabled={isLoading}>
+            <LogIn size={16} /> {isLoading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 

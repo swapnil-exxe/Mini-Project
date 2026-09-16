@@ -4,7 +4,7 @@ import SectionHeader from '../components/SectionHeader.jsx'
 import SearchBar from '../components/SearchBar.jsx'
 import FilterBar from '../components/FilterBar.jsx'
 import StoryCard from '../components/StoryCard.jsx'
-import { FileQuestion } from 'lucide-react'
+import { FileQuestion, RotateCcw } from 'lucide-react'
 
 function Stories({ stories }) {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -12,38 +12,58 @@ function Stories({ stories }) {
   // Read URL query parameters
   const branchParam = searchParams.get('branch') || ''
   const companyParam = searchParams.get('company') || ''
+  const roleParam = searchParams.get('role') || ''
   const searchParam = searchParams.get('search') || ''
 
   // Local state initialized from query params
   const [searchVal, setSearchVal] = useState(searchParam)
   const [selectedBranch, setSelectedBranch] = useState(branchParam)
   const [selectedCompany, setSelectedCompany] = useState(companyParam)
+  const [selectedRole, setSelectedRole] = useState(roleParam)
   const [selectedYear, setSelectedYear] = useState('')
+  const [selectedSort, setSelectedSort] = useState('latest')
 
   // Keep state sync'd if URL changes
   useEffect(() => {
     setSearchVal(searchParams.get('search') || '')
     setSelectedBranch(searchParams.get('branch') || '')
     setSelectedCompany(searchParams.get('company') || '')
+    setSelectedRole(searchParams.get('role') || '')
   }, [searchParams])
 
-  // Extract unique options from mock data for filters
+  // Extract unique options from stories dataset for filters
   const uniqueBranches = [...new Set(stories.map(s => s.branch))]
   const uniqueCompanies = [...new Set(stories.map(s => s.company))]
+  const uniqueRoles = [...new Set(stories.map(s => s.jobRole))]
   const uniqueYears = [...new Set(stories.map(s => s.passoutYear.toString()))]
 
   // Filter logic
-  const filteredStories = stories.filter(story => {
+  let filteredStories = stories.filter(story => {
     const matchesSearch = 
       story.studentName.toLowerCase().includes(searchVal.toLowerCase()) ||
       story.company.toLowerCase().includes(searchVal.toLowerCase()) ||
-      story.jobRole.toLowerCase().includes(searchVal.toLowerCase())
+      story.jobRole.toLowerCase().includes(searchVal.toLowerCase()) ||
+      story.branch.toLowerCase().includes(searchVal.toLowerCase())
 
     const matchesBranch = !selectedBranch || story.branch === selectedBranch
     const matchesCompany = !selectedCompany || story.company === selectedCompany
+    const matchesRole = !selectedRole || story.jobRole === selectedRole
     const matchesYear = !selectedYear || story.passoutYear.toString() === selectedYear
 
-    return matchesSearch && matchesBranch && matchesCompany && matchesYear
+    return matchesSearch && matchesBranch && matchesCompany && matchesRole && matchesYear
+  })
+
+  // Sorting logic
+  filteredStories = [...filteredStories].sort((a, b) => {
+    if (selectedSort === 'cgpa') {
+      return (b.cgpa || 0) - (a.cgpa || 0)
+    } else if (selectedSort === 'year') {
+      return b.passoutYear - a.passoutYear
+    } else if (selectedSort === 'company') {
+      return a.company.localeCompare(b.company)
+    }
+    // Default: latest (placementYear or id)
+    return (b.placementYear || 2025) - (a.placementYear || 2025)
   })
 
   // Handlers that update URL state as well
@@ -62,15 +82,26 @@ function Stories({ stories }) {
     updateQueryParams({ company: val })
   }
 
+  const handleRoleChange = (val) => {
+    setSelectedRole(val)
+    updateQueryParams({ role: val })
+  }
+
   const handleYearChange = (val) => {
     setSelectedYear(val)
+  }
+
+  const handleSortChange = (val) => {
+    setSelectedSort(val)
   }
 
   const handleReset = () => {
     setSearchVal('')
     setSelectedBranch('')
     setSelectedCompany('')
+    setSelectedRole('')
     setSelectedYear('')
+    setSelectedSort('latest')
     setSearchParams({})
   }
 
@@ -92,7 +123,7 @@ function Stories({ stories }) {
       <SectionHeader 
         label="Placement Database"
         title="Placement Stories" 
-        subtitle="Learn from students who have already walked the placement journey and successfully cracked interviews."
+        subtitle="Learn from seniors who have already walked the placement journey and cracked interviews at top companies."
       />
 
       {/* Search & Filter Section */}
@@ -111,11 +142,45 @@ function Stories({ stories }) {
           onCompanyChange={handleCompanyChange}
           selectedYear={selectedYear}
           onYearChange={handleYearChange}
+          selectedRole={selectedRole}
+          onRoleChange={handleRoleChange}
+          selectedSort={selectedSort}
+          onSortChange={handleSortChange}
           onReset={handleReset}
           branches={uniqueBranches}
           companies={uniqueCompanies}
           years={uniqueYears}
+          roles={uniqueRoles}
         />
+      </div>
+
+      {/* Active Results Summary */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1.5rem',
+        fontSize: '0.85rem',
+        color: 'var(--text-secondary)'
+      }}>
+        <span>Showing <strong>{filteredStories.length}</strong> placement {filteredStories.length === 1 ? 'story' : 'stories'}</span>
+        {(selectedBranch || selectedCompany || selectedRole || selectedYear || searchVal) && (
+          <button 
+            onClick={handleReset}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--success)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+              fontSize: '0.8rem'
+            }}
+          >
+            <RotateCcw size={12} /> Clear all filters
+          </button>
+        )}
       </div>
 
       {/* Stories Output Grid */}
@@ -138,7 +203,7 @@ function Stories({ stories }) {
           <FileQuestion size={48} style={{ color: 'var(--text-muted)' }} />
           <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>No Placement Stories Found</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '400px' }}>
-            We couldn't find any stories matching your current search criteria. Try modifying your filters or resetting them.
+            We couldn't find any stories matching your current search criteria. Try modifying your search term or resetting your filters.
           </p>
           <button onClick={handleReset} className="btn btn-secondary">
             Reset All Filters

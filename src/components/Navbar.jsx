@@ -20,10 +20,11 @@ function Navbar({ currentUser, onLogout }) {
       position: 'sticky',
       top: 0,
       zIndex: 100,
-      background: 'rgba(13, 13, 14, 0.8)',
+      background: 'rgba(13, 13, 14, 0.85)',
       backdropFilter: 'var(--glass-blur)',
+      WebkitBackdropFilter: 'var(--glass-blur)',
       borderBottom: '1px solid var(--border-color)',
-      padding: '1rem 0'
+      padding: '0.85rem 0'
     }}>
       <div className="container" style={{
         display: 'flex',
@@ -44,63 +45,75 @@ function Navbar({ currentUser, onLogout }) {
           LOOP
           <span style={{
             fontSize: '0.65rem',
-            padding: '2px 6px',
-            border: '1px solid rgba(255,255,255,0.2)',
+            padding: '2px 7px',
+            background: 'rgba(16, 185, 129, 0.1)',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            color: 'var(--success)',
             borderRadius: '4px',
-            fontWeight: 500,
+            fontWeight: 600,
             letterSpacing: '0.05em'
-          }}>PHASE 1</span>
+          }}>PHASE II</span>
         </Link>
-
-        {/* Desktop Nav Items */}
-        <div style={{ display: 'none' }} className="desktop-nav-links">
-          {/* We will write inline display: flex styles matching desktop media queries in css, but let's make it show via CSS class or inline styling with browser responsiveness. Wait, React styles are static, let's style it properly */}
-        </div>
         
-        {/* Style standard list in navigation */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <div className="nav-links-container" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <NavLink to="/stories" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Stories</NavLink>
-            <NavLink to="/resources" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Resources</NavLink>
+        {/* Navigation Items */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+          <div className="nav-links-container" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+            <NavLink to="/stories" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Placement Stories</NavLink>
+            <NavLink to="/resources" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Study Resources</NavLink>
             <NavLink to="/achievements" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Achievements</NavLink>
             
             {currentUser && (
               <>
-                <NavLink to="/dashboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Dashboard</NavLink>
+                <NavLink to="/dashboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+                  Dashboard
+                </NavLink>
+                <NavLink to="/submit-story" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <PenSquare size={14} /> Submit Story
+                </NavLink>
                 {currentUser.role === 'admin' && (
-                  <NavLink to="/admin" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} style={{ color: 'var(--warning)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <NavLink to="/admin" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} style={{ color: 'var(--warning)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                     <Shield size={14} /> Admin
                   </NavLink>
                 )}
-                {(currentUser.role === 'contributor' || currentUser.role === 'admin') && (
-                  <NavLink to="/submit-story" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                    <PenSquare size={14} /> Submit Story
-                  </NavLink>
-                )}
-                <NavLink to="/profile" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <NavLink to="/profile" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                   <User size={14} /> Profile
                 </NavLink>
               </>
             )}
           </div>
 
+          {/* User Account Controls */}
           {currentUser ? (
-            <button onClick={handleLogoutClick} className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>
-              <LogOut size={14} /> Logout
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{
+                fontSize: '0.75rem',
+                color: 'var(--text-secondary)',
+                display: 'none',
+                alignItems: 'center',
+                gap: '0.3rem'
+              }} className="user-badge">
+                <span className={`role-pill role-${currentUser.role}`}>
+                  {currentUser.role}
+                </span>
+              </span>
+              <button onClick={handleLogoutClick} className="btn btn-secondary" style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem' }}>
+                <LogOut size={14} /> Logout
+              </button>
+            </div>
           ) : (
-            <Link to="/login" className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>
-              <LogIn size={14} /> Login
+            <Link to="/login" className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.8rem' }}>
+              <LogIn size={14} /> Sign In
             </Link>
           )}
 
-          {/* Mobile Menu Toggle button */}
+          {/* Mobile Toggle */}
           <button onClick={toggleMenu} className="menu-toggle-btn" style={{
             background: 'none',
             border: 'none',
             color: '#ffffff',
             cursor: 'pointer',
-            display: 'none'
+            display: 'none',
+            padding: '0.25rem'
           }}>
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -122,43 +135,54 @@ function Navbar({ currentUser, onLogout }) {
           gap: '1rem',
           zIndex: 99
         }}>
-          <Link to="/stories" onClick={closeMenu} style={{ padding: '0.5rem 0' }}>Stories</Link>
-          <Link to="/resources" onClick={closeMenu} style={{ padding: '0.5rem 0' }}>Resources</Link>
-          <Link to="/achievements" onClick={closeMenu} style={{ padding: '0.5rem 0' }}>Achievements</Link>
+          <Link to="/stories" onClick={closeMenu} style={{ padding: '0.5rem 0', fontSize: '0.95rem' }}>Placement Stories</Link>
+          <Link to="/resources" onClick={closeMenu} style={{ padding: '0.5rem 0', fontSize: '0.95rem' }}>Study Resources</Link>
+          <Link to="/achievements" onClick={closeMenu} style={{ padding: '0.5rem 0', fontSize: '0.95rem' }}>Achievements</Link>
           {currentUser && (
             <>
-              <Link to="/dashboard" onClick={closeMenu} style={{ padding: '0.5rem 0' }}>Dashboard</Link>
+              <Link to="/dashboard" onClick={closeMenu} style={{ padding: '0.5rem 0', fontSize: '0.95rem' }}>Student Dashboard</Link>
+              <Link to="/submit-story" onClick={closeMenu} style={{ padding: '0.5rem 0', fontSize: '0.95rem' }}>Submit Placement Story</Link>
               {currentUser.role === 'admin' && (
-                <Link to="/admin" onClick={closeMenu} style={{ padding: '0.5rem 0', color: 'var(--warning)' }}>Admin Panel</Link>
+                <Link to="/admin" onClick={closeMenu} style={{ padding: '0.5rem 0', fontSize: '0.95rem', color: 'var(--warning)' }}>Admin Dashboard</Link>
               )}
-              {(currentUser.role === 'contributor' || currentUser.role === 'admin') && (
-                <Link to="/submit-story" onClick={closeMenu} style={{ padding: '0.5rem 0' }}>Submit Story</Link>
-              )}
-              <Link to="/profile" onClick={closeMenu} style={{ padding: '0.5rem 0' }}>My Profile</Link>
+              <Link to="/profile" onClick={closeMenu} style={{ padding: '0.5rem 0', fontSize: '0.95rem' }}>User Profile</Link>
             </>
           )}
           {currentUser ? (
-            <button onClick={handleLogoutClick} className="btn btn-secondary" style={{ width: '100%' }}>
+            <button onClick={handleLogoutClick} className="btn btn-secondary" style={{ width: '100%', marginTop: '0.5rem' }}>
               Logout
             </button>
           ) : (
-            <Link to="/login" onClick={closeMenu} className="btn btn-primary" style={{ width: '100%' }}>
-              Login
+            <Link to="/login" onClick={closeMenu} className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
+              Sign In
             </Link>
           )}
         </div>
       )}
 
-      {/* Quick dynamic inline style injections for styling the active states and media queries */}
       <style>{`
         .nav-link {
           color: var(--text-secondary);
           font-weight: 500;
-          font-size: 0.9rem;
+          font-size: 0.88rem;
           transition: color 0.2s ease;
         }
         .nav-link:hover, .nav-link.active {
           color: #ffffff;
+        }
+        .role-pill {
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-size: 0.7rem;
+          text-transform: uppercase;
+          font-weight: 600;
+        }
+        .role-student { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        .role-contributor { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+        .role-admin { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+
+        @media (min-width: 901px) {
+          .user-badge { display: inline-flex !important; }
         }
         @media (max-width: 900px) {
           .nav-links-container {

@@ -56,7 +56,7 @@ function App() {
       name,
       email,
       role,
-      branch: role === 'contributor' ? "CSE / AI-DS" : "CSE / AI-DS",
+      branch: "CSE / AI-DS",
       currentYear: role === 'student' ? 3 : 4,
       batch: "2023-2027",
       passoutYear: 2027,
@@ -72,18 +72,10 @@ function App() {
   // Submit Story handler
   const handleAddPendingStory = (newStory) => {
     const pendingItem = {
+      ...newStory,
       id: `pending-${Date.now()}`,
-      studentName: newStory.studentName,
-      company: newStory.company,
-      branch: newStory.branch,
-      submissionDate: new Date().toISOString().split('T')[0],
-      jobRole: newStory.jobRole,
-      batch: newStory.batch,
-      passoutYear: newStory.passoutYear,
-      cgpa: newStory.cgpa,
-      journey: newStory.journey,
-      strategy: newStory.strategy,
-      studyMaterials: newStory.studyMaterials || []
+      status: "Pending",
+      submissionDate: new Date().toISOString().split('T')[0]
     }
     setPendingStories([pendingItem, ...pendingStories])
   }
@@ -95,6 +87,7 @@ function App() {
       const activeStory = {
         ...storyToApprove,
         id: storyToApprove.id.replace('pending-', 'story-'),
+        status: "Approved",
         placementYear: new Date().getFullYear()
       }
       setStories([activeStory, ...stories])
@@ -111,7 +104,6 @@ function App() {
   const handleApproveResource = (id) => {
     const resToApprove = pendingResources.find(r => r.id === id)
     if (resToApprove) {
-      // Find matching folder or create/add to folder
       setResources(prev => prev.map(folder => {
         if (folder.folderName === resToApprove.folder) {
           return {

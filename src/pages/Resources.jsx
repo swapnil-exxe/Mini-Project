@@ -1,40 +1,59 @@
 import React, { useState } from 'react'
-import { Folder, FolderOpen, ChevronRight, FileText, Globe, Search } from 'lucide-react'
+import { Folder, FolderOpen, ChevronRight, FileText, Globe, Search, Download, ExternalLink } from 'lucide-react'
 import SectionHeader from '../components/SectionHeader.jsx'
 import ResourceCard from '../components/ResourceCard.jsx'
 
 function Resources({ resources }) {
   const [activeFolderId, setActiveFolderId] = useState(resources[0]?.id || '')
   const [searchVal, setSearchVal] = useState('')
+  const [activeSubcategory, setActiveSubcategory] = useState('All')
 
-  const activeFolder = resources.find(r => r.id === activeFolderId)
+  const activeFolder = resources.find(r => r.id === activeFolderId) || resources[0]
 
   // Subfolders list helper for visual categorization (academic feel)
   const getSubcategories = (folderName) => {
     switch (folderName) {
       case 'DSA':
-        return ['Arrays', 'Strings', 'Linked Lists', 'Trees', 'Graphs', 'Dynamic Programming']
-      case 'Core CS':
-        return ['DBMS', 'Operating Systems', 'Computer Networks', 'OOP']
+        return ['All', 'Arrays', 'Strings', 'Trees', 'Graphs', 'Dynamic Programming']
+      case 'Web Development':
+        return ['All', 'Frontend', 'Backend', 'APIs', 'Performance']
+      case 'DBMS':
+        return ['All', 'SQL', 'Indexing', 'Normalization', 'NoSQL']
+      case 'Operating Systems':
+        return ['All', 'Process Scheduling', 'Concurrency', 'Memory']
+      case 'Computer Networks':
+        return ['All', 'TCP/IP', 'Subnetting', 'Protocols']
+      case 'System Design':
+        return ['All', 'Scalability', 'LLD', 'Sharding']
+      case 'Aptitude':
+        return ['All', 'Quantitative', 'Logical Reasoning']
+      case 'Interview Preparation':
+        return ['All', 'Behavioral', 'Resume', 'HR Questions']
       default:
-        return []
+        return ['All']
     }
   }
 
-  // Filter items in the folder by search query if needed
+  // Filter items in the folder by search query and subcategory
   const filteredItems = activeFolder?.items.filter(item => {
-    return (
+    const matchesQuery = 
       item.title.toLowerCase().includes(searchVal.toLowerCase()) ||
       item.desc.toLowerCase().includes(searchVal.toLowerCase())
-    )
+
+    const matchesSub = 
+      activeSubcategory === 'All' || 
+      item.title.toLowerCase().includes(activeSubcategory.toLowerCase()) ||
+      item.desc.toLowerCase().includes(activeSubcategory.toLowerCase())
+
+    return matchesQuery && matchesSub
   }) || []
 
   return (
     <div className="container" style={{ padding: '3.5rem 1.5rem' }}>
       <SectionHeader 
         label="Learning Library"
-        title="Study Resources" 
-        subtitle="Access subject-specific study sheets, roadmap folders, and tools shared by placed seniors."
+        title="Study Resources Explorer" 
+        subtitle="Access subject-specific study sheets, roadmap folders, code guides, and preparation tools shared by placed seniors."
       />
 
       <div style={{
@@ -45,7 +64,7 @@ function Resources({ resources }) {
         
         {/* Sidebar: Folder selectors */}
         <div>
-          <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', fontFamily: 'var(--font-display)' }}>Folders</h3>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', fontFamily: 'var(--font-display)' }}>Study Folders</h3>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
@@ -56,15 +75,19 @@ function Resources({ resources }) {
               return (
                 <button
                   key={folder.id}
-                  onClick={() => { setActiveFolderId(folder.id); setSearchVal(''); }}
+                  onClick={() => { 
+                    setActiveFolderId(folder.id); 
+                    setSearchVal(''); 
+                    setActiveSubcategory('All');
+                  }}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '0.75rem 1rem',
-                    backgroundColor: isActive ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+                    backgroundColor: isActive ? 'rgba(16, 185, 129, 0.08)' : 'transparent',
                     border: '1px solid',
-                    borderColor: isActive ? 'var(--border-focus)' : 'var(--border-color)',
+                    borderColor: isActive ? 'rgba(16, 185, 129, 0.3)' : 'var(--border-color)',
                     borderRadius: '6px',
                     color: isActive ? '#ffffff' : 'var(--text-secondary)',
                     cursor: 'pointer',
@@ -79,7 +102,7 @@ function Resources({ resources }) {
                       {folder.folderName}
                     </span>
                   </div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '0.75rem', color: isActive ? 'var(--success)' : 'var(--text-muted)' }}>
                     ({folder.items.length})
                   </span>
                 </button>
@@ -115,7 +138,7 @@ function Resources({ resources }) {
                   onChange={(e) => setSearchVal(e.target.value)}
                   className="form-control"
                   placeholder="Search in folder..."
-                  style={{ height: '34px', fontSize: '0.8rem', paddingLeft: '2rem' }}
+                  style={{ height: '36px', fontSize: '0.8rem', paddingLeft: '2rem' }}
                 />
                 <Search size={14} style={{
                   position: 'absolute',
@@ -128,47 +151,104 @@ function Resources({ resources }) {
             </div>
           )}
 
-          {/* Academic Subcategories checklist indicator */}
+          {/* Academic Subcategories Filter Tags */}
           {activeFolder && getSubcategories(activeFolder.folderName).length > 0 && (
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '0.5rem',
-              marginBottom: '1.5rem'
+              gap: '0.4rem',
+              marginBottom: '1.5rem',
+              alignItems: 'center'
             }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', alignSelf: 'center', marginRight: '0.5rem' }}>Covered topics:</span>
-              {getSubcategories(activeFolder.folderName).map((sub, idx) => (
-                <span 
-                  key={idx} 
-                  style={{
-                    fontSize: '0.7rem',
-                    backgroundColor: 'rgba(255,255,255,0.03)',
-                    border: '1px solid var(--border-color)',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    color: 'var(--text-secondary)'
-                  }}
-                >
-                  {sub}
-                </span>
-              ))}
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Subcategories:</span>
+              {getSubcategories(activeFolder.folderName).map((sub, idx) => {
+                const isSelected = activeSubcategory === sub
+                return (
+                  <button 
+                    key={idx}
+                    onClick={() => setActiveSubcategory(sub)}
+                    style={{
+                      fontSize: '0.75rem',
+                      backgroundColor: isSelected ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.03)',
+                      border: '1px solid',
+                      borderColor: isSelected ? 'rgba(16, 185, 129, 0.3)' : 'var(--border-color)',
+                      padding: '3px 10px',
+                      borderRadius: '4px',
+                      color: isSelected ? 'var(--success)' : 'var(--text-secondary)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {sub}
+                  </button>
+                )
+              })}
             </div>
           )}
 
           {/* Resource cards list */}
           {filteredItems.length > 0 ? (
-            <div className="grid-3">
+            <div className="grid-2">
               {filteredItems.map((item, index) => (
-                <ResourceCard 
+                <div 
                   key={index} 
-                  resource={item} 
-                  folderName={activeFolder.folderName} 
-                />
+                  className="editorial-card"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '1.25rem'
+                  }}
+                >
+                  <div>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '0.5rem'
+                    }}>
+                      <span className="label-caps" style={{ fontSize: '0.65rem', color: 'var(--success)' }}>
+                        {activeFolder.folderName}
+                      </span>
+                      <span style={{
+                        fontSize: '0.7rem',
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid var(--border-color)',
+                        padding: '1px 6px',
+                        borderRadius: '4px',
+                        color: 'var(--text-muted)'
+                      }}>
+                        {item.type}
+                      </span>
+                    </div>
+
+                    <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.35rem' }}>{item.title}</h4>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '1.25rem' }}>
+                      {item.desc}
+                    </p>
+                  </div>
+
+                  <a 
+                    href={item.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="btn btn-secondary"
+                    style={{
+                      width: '100%',
+                      justifyContent: 'center',
+                      padding: '0.5rem',
+                      fontSize: '0.8rem',
+                      gap: '0.4rem'
+                    }}
+                  >
+                    {item.type === 'PDF' ? <Download size={14} /> : <ExternalLink size={14} />}
+                    {item.type === 'PDF' ? 'Download PDF Resource' : 'Open Resource Link'}
+                  </a>
+                </div>
               ))}
             </div>
           ) : (
             <div className="editorial-card" style={{ textAlign: 'center', padding: '3rem 2rem' }}>
-              <p style={{ color: 'var(--text-muted)' }}>No resources found in this folder matching your query.</p>
+              <p style={{ color: 'var(--text-muted)' }}>No study resources found matching your current filter.</p>
             </div>
           )}
         </div>
