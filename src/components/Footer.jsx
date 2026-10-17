@@ -17,7 +17,7 @@ function Footer() {
           marginBottom: '3rem'
         }}>
           <div>
-            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '1rem' }}>LOOP</h3>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.25rem', marginBottom: '1rem' }}>LOOP — SPIT ALUMNI & SENIOR NETWORK</h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '300px' }}>
               Launchpad of Outstanding Placements. A centralized placement knowledge sharing platform.
             </p>
@@ -58,9 +58,9 @@ function Footer() {
           fontSize: '0.8rem',
           color: 'var(--text-muted)'
         }}>
-          <p>&copy; {new Date().getFullYear()} LOOP - College Mini Project. All rights reserved.</p>
-          <p style={{ fontStyle: 'italic' }}>
-            Disclaimer: All names, packages, and records displayed are for prototyping purposes only.
+          <p style={{ margin: 0 }}>© 2026 Loop. Created exclusively for Sardar Patel Institute of Technology.</p>
+          <p style={{ margin: 0, fontWeight: 500 }}>
+            Developed by Swapnil Patil
           </p>
         </div>
       </div>
